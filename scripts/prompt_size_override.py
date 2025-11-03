@@ -41,6 +41,18 @@ class PromptSizeOverrideScript(scripts.Script):
                 settings_str = match.group(1)
                 settings = json.loads(settings_str)
 
+                if "negative" in settings:
+                    # p.negative_prompt を更新
+                    p.negative_prompt = p.negative_prompt + ", " + settings["negative"]
+
+                    # p.all_negative_prompts の各要素も更新
+                    if p.all_negative_prompts:
+                        p.all_negative_prompts = [np + ", " + settings["negative"] for np in p.all_negative_prompts]
+                    else:
+                        # もし p.all_negative_prompts がまだ初期化されていない場合（稀なケース）
+                        # p.negative_prompt の値で初期化する
+                        p.all_negative_prompts = [p.negative_prompt] * p.batch_size * p.n_iter
+
                 if "width" in settings:
                     p.width = settings["width"]
                 if "height" in settings:
